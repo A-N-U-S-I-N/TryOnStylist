@@ -1,12 +1,25 @@
 {
     "manifest_version": 3,
-    "name": "TryOnStylist",
-    "version": "1.0",
-    "description": "Instantly send clothing items to TryOnStylist for a virtual try-on.",
+    "name": "TryOnStylist Pro",
+    "version": "2.0",
+    "description": "Instantly try on clothes and analyze color matches.",
     "action": {
       "default_popup": "popup.html"
     },
     "permissions": [
-      "activeTab"
+      "activeTab",
+      "storage"
+    ],
+    "host_permissions": [
+      "<all_urls>"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }
     ]
   }

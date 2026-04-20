@@ -2,16 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="w-64 p-5 text-center bg-white border border-gray-200 shadow-xl">
+<body>
   
-  <h1 class="mb-1 text-lg font-extrabold tracking-widest text-black uppercase">TryOnStylist</h1>
-  <p class="mb-4 text-xs text-gray-500">Found a garment you love? See how it looks on you.</p>
-  
-  <button id="send-btn" class="w-full px-4 py-2 text-sm font-bold tracking-widest text-white uppercase transition-colors bg-black rounded hover:bg-gray-800">
-    <i class="mr-2 fa-solid fa-wand-magic-sparkles"></i> Try It On
-  </button>
+  <div class="container">
+    <div class="header">
+      <i class="fa-solid fa-shirt"></i>TryOnStylist
+    </div>
+    
+    <div class="content">
+      <div class="icon-circle">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+      </div>
+      
+      <h2>Found your perfect fit?</h2>
+      <p>Instantly send this item to your virtual fitting room to see how it looks on you.</p>
+      
+      <button id="send-btn" class="btn-primary">
+        <i class="fa-solid fa-camera-viewfinder"></i> Try It On Now
+      </button>
+    </div>
+    
+    <div class="footer">
+      Powered by AI Engine
+    </div>
+  </div>
 
   <script src="popup.js"></script>
 </body>
