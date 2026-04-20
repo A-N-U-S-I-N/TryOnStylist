@@ -15,7 +15,12 @@ export default function AdminDashboard() {
 
   const menCategories = ['tshirt', 'shirt', 'hoodie', 'jacket', 'pant'];
   const womenCategories = ['tshirt', 'shirt', 'hoodie', 'jacket', 'tops', 'skirt', 'pant', 'one-piece'];
-  const activeCategories = formData.gender === 'men' ? menCategories : womenCategories;
+  
+  let activeCategories = womenCategories; 
+  if (formData.gender === 'men') activeCategories = menCategories;
+  if (formData.gender === 'both') {
+    activeCategories = [...new Set([...menCategories, ...womenCategories])];
+  }
 
   useEffect(() => {
     fetchUsers();
@@ -41,18 +46,36 @@ export default function AdminDashboard() {
     if (!image) return showToast("Please upload a product image.", "warning");
     setLoading(true);
     
-    const data = new FormData();
-    Object.keys(formData).forEach(key => data.append(key, formData[key]));
-    data.append('productImage', image);
+    const uploadProduct = async (targetGender) => {
+      const data = new FormData();
+      
+      Object.keys(formData).forEach(key => {
+        if (key !== 'gender') data.append(key, formData[key]);
+      });
+      
+      data.append('gender', targetGender);
+      data.append('productImage', image);
+      
+      return axios.post('/api/admin/products', data, { headers: { Authorization: `Bearer ${token}` } });
+    };
     
     try {
-      await axios.post('/api/admin/products', data, { headers: { Authorization: `Bearer ${token}` } });
+      if (formData.gender === 'both') {
+        await uploadProduct('men');
+        await uploadProduct('women');
+      } else {
+        await uploadProduct(formData.gender);
+      }
+
       showToast('Product Added Successfully!', 'success');
       setFormData({ name: '', price: '', stock: '', description: '', gender: 'women', category: 'tshirt' });
       setImage(null);
       document.getElementById('imageUpload').value = '';
-    } catch (err) { showToast('Failed to upload product.', 'error'); } 
-    finally { setLoading(false); }
+    } catch (err) { 
+      showToast('Failed to upload product.', 'error'); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   return (
@@ -79,6 +102,7 @@ export default function AdminDashboard() {
             <select value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value, category: 'tshirt'})} className="w-full p-3 text-sm uppercase border border-gray-300 outline-none focus:border-black">
               <option value="women">Women</option>
               <option value="men">Men</option>
+              <option value="both">Both (Men & Women)</option>
             </select>
           </div>
           <div>
