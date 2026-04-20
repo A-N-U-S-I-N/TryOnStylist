@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
-import axios from 'axios'; // <-- 1. Import Axios!
+import axios from 'axios'; 
 
 export const AuthContext = createContext();
 
@@ -21,11 +21,10 @@ export const AuthProvider = ({ children }) => {
     setRole(null);
   };
 
-  // 2. Updated to use Axios
   const login = async (email, password) => {
     try {
       const response = await axios.post('/api/auth/login', { email, password });
-      const data = response.data; // Axios automatically parses JSON
+      const data = response.data; 
       
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', data.user.role);
@@ -34,12 +33,10 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       setRole(data.user.role);
     } catch (error) {
-      // Axios puts server error messages inside error.response.data
       throw new Error(error.response?.data?.message || 'Login failed');
     }
   };
   
-  // 3. Updated to use Axios
   const register = async (name, email, password) => {
     try {
       const response = await axios.post('/api/auth/register', {
