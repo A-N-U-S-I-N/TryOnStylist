@@ -13,7 +13,8 @@ const { Contact, Subscriber, Cart, Order } = require('./models');
 
 const app = express();
 app.use(cors({
-  origin: 'https://www.your-live-website.com' 
+  origin: 'https://tryonstylist.vercel.app', 
+  credentials: true
 }));
 app.use(express.json());
 
