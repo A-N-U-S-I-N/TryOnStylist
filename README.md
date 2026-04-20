@@ -22,4 +22,4 @@ TryOnStylist is a cutting-edge, AI-powered e-commerce and styling platform. It r
 
 ---
 
-* **Designed and built by the TryOnStylist Studio.**
+*Designed and built by the TryOnStylist Studio.*
