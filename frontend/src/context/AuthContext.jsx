@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
+import axios from 'axios'; // <-- 1. Import Axios!
 
 export const AuthContext = createContext();
 
@@ -20,47 +21,44 @@ export const AuthProvider = ({ children }) => {
     setRole(null);
   };
 
+  // 2. Updated to use Axios
   const login = async (email, password) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message);
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('role', data.user.role);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    setToken(data.token);
-    setUser(data.user);
-    setRole(data.user.role);
+    try {
+      const response = await axios.post('/api/auth/login', { email, password });
+      const data = response.data; // Axios automatically parses JSON
+      
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.user.role);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setToken(data.token);
+      setUser(data.user);
+      setRole(data.user.role);
+    } catch (error) {
+      // Axios puts server error messages inside error.response.data
+      throw new Error(error.response?.data?.message || 'Login failed');
+    }
   };
   
+  // 3. Updated to use Axios
   const register = async (name, email, password) => {
-    const response = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify({ 
+    try {
+      const response = await axios.post('/api/auth/register', {
         name: name.trim(),      
         email: email.trim().toLowerCase(),
         password: password      
-      })
-    });
-    const data = await response.json();
-    
-    if (!response.ok) {
-      console.error('Register error:', data); 
-      throw new Error(data.message || 'Registration failed');
+      });
+      const data = response.data;
+      
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.user.role);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setToken(data.token);
+      setRole(data.user.role);
+      setUser(data.user);
+    } catch (error) {
+      console.error('Register error:', error.response?.data); 
+      throw new Error(error.response?.data?.message || 'Registration failed');
     }
-    
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('role', data.user.role);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    setToken(data.token);
-    setRole(data.user.role);
-    setUser(data.user);
   };  
   
   return (
