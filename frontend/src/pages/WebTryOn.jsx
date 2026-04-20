@@ -10,8 +10,9 @@ export default function WebTryOn() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [url, setUrl] = useState(location.state?.url || '');
-  const [extracting, setExtracting] = useState(false);
+  const searchParams = new URLSearchParams(location.search);
+
+  const [url, setUrl] = useState(location.state?.url || searchParams.get('url') || ''); const [extracting, setExtracting] = useState(false);
   const [extractedImageUrl, setExtractedImageUrl] = useState(location.state?.imageUrl || null);
 
   const [userImage, setUserImage] = useState(null);
@@ -47,7 +48,7 @@ export default function WebTryOn() {
     try {
       const res = await axios.post('/api/extract-image', { url }, { headers: { Authorization: `Bearer ${token}` } });
       setExtractedImageUrl(res.data.imageUrl);
-      setMatchResult(null); 
+      setMatchResult(null);
       showToast('Product image extracted successfully!', 'success');
     } catch (err) {
       showToast(err.response?.data?.error || 'Failed to extract image. The site may be blocking access.', 'error');
@@ -66,7 +67,7 @@ export default function WebTryOn() {
       const eyeDropper = new window.EyeDropper();
       const result = await eyeDropper.open();
       calculateMatch(result.sRGBHex);
-    } catch (e) {  }
+    } catch (e) { }
   };
 
   const calculateMatch = (pickedHex) => {
@@ -99,7 +100,7 @@ export default function WebTryOn() {
     const file = e.target.files[0];
     if (file) {
       setUserImage(file);
-      setExistingUserImage(null); 
+      setExistingUserImage(null);
       setUserPreview(URL.createObjectURL(file));
     }
   };
@@ -122,7 +123,7 @@ export default function WebTryOn() {
       if (i > 0) {
         showToast(`Server busy. Switching to AI Model ${i + 1}... please wait.`, 'info');
       }
-      
+
       formData.set('modelIndex', i);
 
       try {
@@ -132,7 +133,7 @@ export default function WebTryOn() {
         success = true;
         showToast('Generation complete! Saved to your fits.', 'success');
         navigate('/dashboard');
-        break; 
+        break;
       } catch (err) {
         console.error(`Model ${i} failed. Trying next...`);
       }
@@ -226,10 +227,10 @@ export default function WebTryOn() {
             ) : (
               <div className="relative mb-6 group">
                 <p className="absolute z-10 hidden px-2 py-1 text-[10px] font-bold text-white uppercase transform -translate-x-1/2 bg-black rounded shadow-md top-2 left-1/2 group-hover:block">Your Photo</p>
-                
+
                 <img src={userPreview} alt="User" className="object-contain w-full h-48 p-2 border border-gray-200 bg-gray-50" />
-                
-                <button onClick={() => {setUserPreview(null); setUserImage(null); setExistingUserImage(null);}} className="absolute flex items-center justify-center w-8 h-8 text-white transition-colors bg-red-500 rounded-full shadow-md top-2 right-2 hover:bg-red-700">
+
+                <button onClick={() => { setUserPreview(null); setUserImage(null); setExistingUserImage(null); }} className="absolute flex items-center justify-center w-8 h-8 text-white transition-colors bg-red-500 rounded-full shadow-md top-2 right-2 hover:bg-red-700">
                   <i className="fa-solid fa-times"></i>
                 </button>
               </div>

@@ -1,0 +1,12 @@
+{
+    "manifest_version": 3,
+    "name": "TryOnStylist",
+    "version": "1.0",
+    "description": "Instantly send clothing items to TryOnStylist for a virtual try-on.",
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "permissions": [
+      "activeTab"
+    ]
+  }
