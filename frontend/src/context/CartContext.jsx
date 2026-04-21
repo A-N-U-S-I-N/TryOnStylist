@@ -8,7 +8,8 @@ export const CartContext = createContext();
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem('guestCart');
-    return savedCart ? JSON.parse(savedCart) : [];
+    const parsed = savedCart ? JSON.parse(savedCart) : [];
+    return parsed.filter(item => item.product != null);
   });
   
   const [totalPrice, setTotalPrice] = useState(0);
@@ -19,13 +20,20 @@ export function CartProvider({ children }) {
       axios.get('/api/cart', {
         headers: { Authorization: `Bearer ${token}` }
       })
-      .then(res => setCartItems(res.data))
+      .then(res => {
+        const validItems = res.data.filter(item => item.product != null);
+        setCartItems(validItems);
+      })
       .catch(err => console.error("Error fetching cart", err));
     }
   }, [token]);
 
   useEffect(() => {
-    const total = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+    const total = cartItems.reduce((sum, item) => {
+      const itemPrice = item.product?.price || 0; 
+      return sum + (itemPrice * item.quantity);
+    }, 0);
+    
     setTotalPrice(total);
     
     if (!token) {
@@ -39,16 +47,19 @@ export function CartProvider({ children }) {
         const res = await axios.post('/api/cart', {
           productId: product._id, quantity
         }, { headers: { Authorization: `Bearer ${token}` } });
-        setCartItems(res.data);
+        
+        const validItems = res.data.filter(item => item.product != null);
+        setCartItems(validItems);
+        
         showToast(`${product.name} added to cart!`, "success");
       } catch (err) {
         showToast("Failed to add to cart.", "error");
       }
     } else {
       setCartItems(prev => {
-        const existing = prev.find(item => item.product._id === product._id);
+        const existing = prev.find(item => item.product?._id === product._id);
         if (existing) {
-          return prev.map(item => item.product._id === product._id ? { ...item, quantity: item.quantity + quantity } : item);
+          return prev.map(item => item.product?._id === product._id ? { ...item, quantity: item.quantity + quantity } : item);
         }
         return [...prev, { product, quantity }];
       });
@@ -61,10 +72,11 @@ export function CartProvider({ children }) {
     if (token) {
       try {
         const res = await axios.put(`/api/cart/${productId}`, { quantity }, { headers: { Authorization: `Bearer ${token}` } });
-        setCartItems(res.data);
+        const validItems = res.data.filter(item => item.product != null);
+        setCartItems(validItems);
       } catch (err) { console.error(err); }
     } else {
-      setCartItems(prev => prev.map(item => item.product._id === productId ? { ...item, quantity } : item));
+      setCartItems(prev => prev.map(item => item.product?._id === productId ? { ...item, quantity } : item));
     }
   };
 
@@ -72,10 +84,11 @@ export function CartProvider({ children }) {
     if (token) {
       try {
         const res = await axios.delete(`/api/cart/${productId}`, { headers: { Authorization: `Bearer ${token}` } });
-        setCartItems(res.data);
+        const validItems = res.data.filter(item => item.product != null);
+        setCartItems(validItems);
       } catch (err) { console.error(err); }
     } else {
-      setCartItems(prev => prev.filter(item => item.product._id !== productId));
+      setCartItems(prev => prev.filter(item => item.product?._id !== productId));
     }
   };
 
